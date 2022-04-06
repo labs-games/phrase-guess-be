@@ -1,8 +1,6 @@
 # pylint: skip-file
 from typing import Any
 
-from backend.settings import IS_TEST_CASE
-
 """
 Common logger library
 
@@ -394,7 +392,4 @@ class MockLog:
 
 
 if log is None:
-    if IS_TEST_CASE:
-        log = MockLog()
-    else:
-        try_init_logger()
+    try_init_logger()
