@@ -70,6 +70,16 @@ TEMPLATES = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_PAGINATION_CLASS": "common.rest.pagination.DefaultPageNumberPagination",
+    "EXCEPTION_HANDLER": "common.rest.views.exception_handler",
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+}
+
+
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 WSGI_APPLICATION = "backend.wsgi.application"
