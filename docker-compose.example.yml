@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  web:
+    build:
+      dockerfile: Dockerfile_local
+      context: .
+    volumes:
+      - .:/code/
+    ports:
+      - "8001:8001"
+    environment:
+      - DEBUG=1
+      - DB_NAME=phrase-guess
+      - DB_USER=# Your own user
+      - DB_PASS=# Your Own PW
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+    command: python3 manage.py runserver 0.0.0.0:8001

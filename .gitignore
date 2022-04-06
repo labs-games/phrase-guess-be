@@ -1,0 +1,23 @@
+# Global #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+.swp
+ehthumbs.db
+Thumbs.db
+/.idea/
+db.sqlite3
+
+*.pyc
+
+docker-compose.yml
+
+# Tools
+.mypy_cache/
+__pycache__/
+.coverage
+htmlcov/
+log/
+.dmypy.json
