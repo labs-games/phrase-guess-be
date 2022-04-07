@@ -206,7 +206,14 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
         if judgement.should_round_ended:
             game_round.is_ended = True
             game_round.save()
-        return self.generate_no_error_response({})
+        return self.generate_no_error_response(
+            {
+                "status": judgement.status,
+                "score": judgement.score,
+                "team_id": team.id,
+                "should_end": judgement.should_round_ended,
+            }
+        )
 
     def _judge_guess(
         self, game_round: Round, guess_type: GuessType, guess_value: str
