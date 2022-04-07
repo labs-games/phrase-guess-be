@@ -10,7 +10,13 @@ from backend.models import Game, GameConfigs, Ordering, Phrase, Team
 from common.rest.exceptions import ErrorCode, ErrorCodeException
 from common.rest.views import ActiveUserAPIViewMixin
 
-from .serializers import GameCreationSerializer, GameSerializer, PhraseSerializer, TeamSerializer
+from .serializers import (
+    GameCreationSerializer,
+    GameDetailsSerializer,
+    GameSerializer,
+    PhraseSerializer,
+    TeamSerializer,
+)
 
 
 class GamesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
@@ -43,7 +49,7 @@ class GamesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
 
 class GameView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = GameSerializer
+    serializer_class = GameDetailsSerializer
 
     def get_object(self) -> Game:
         game_id: int = self.kwargs["game_id"]
