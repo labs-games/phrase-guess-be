@@ -220,14 +220,7 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
         phrase_value: str = game_round.phrase.value
         if phrase_value != guess_value:
             return GuessJudgement(status=GuessStatus.wrong, score=0, should_round_ended=False)
-
-        guessed_letters: set[str] = {
-            g.value
-            for g in Guess.objects.filter(
-                round=game_round, status=GuessStatus.correct, type=GuessType.letter
-            )
-        }
-        unguessed_letters: list[str] = [c for c in phrase_value if c not in guessed_letters]
+        unguessed_letters: list[str] = _get_unguessed_letters(game_round)
         return GuessJudgement(
             status=GuessStatus.correct,
             score=len(unguessed_letters) * SCORE_PER_LETTERS,
@@ -235,20 +228,26 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
         )
 
     def _judge_letter_guess(self, game_round: Round, guess_value: str) -> GuessJudgement:
-        phrase_value: str = game_round.phrase.value
-        guessed_letters: set[str] = {
-            g.value
-            for g in Guess.objects.filter(
-                round=game_round, status=GuessStatus.correct, type=GuessType.letter
-            )
-        }
-        unguessed_letters: list[str] = [c for c in phrase_value if c not in guessed_letters]
+        unguessed_letters: list[str] = _get_unguessed_letters(game_round)
         if guess_value not in unguessed_letters:
             return GuessJudgement(status=GuessStatus.wrong, score=0, should_round_ended=False)
 
-        guess_value_counts: int = len([l for l in unguessed_letters if l == guess_value])
+        guess_value_counts: int = len(
+            [letter for letter in unguessed_letters if letter == guess_value]
+        )
         return GuessJudgement(
             status=GuessStatus.correct,
             score=guess_value_counts * SCORE_PER_LETTERS,
             should_round_ended=guess_value_counts == len(unguessed_letters),
         )
+
+
+def _get_unguessed_letters(game_round: Round) -> list[str]:
+    phrase_value: str = game_round.phrase.value
+    guessed_letters: set[str] = {
+        g.value
+        for g in Guess.objects.filter(
+            round=game_round, status=GuessStatus.correct, type=GuessType.letter
+        )
+    }
+    return [c for c in phrase_value if c not in guessed_letters and c != " "]

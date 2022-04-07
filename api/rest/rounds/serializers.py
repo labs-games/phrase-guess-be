@@ -31,7 +31,7 @@ class GuessCreationSerializer(serializers.Serializer, BaseSerializerMixin):
     value = serializers.CharField(max_length=200)
 
     def validate(self, attrs: dict) -> dict:
-        if attrs["type"] == GuessType.letter and len(attrs["value"] > 1):
+        if attrs["type"] == GuessType.letter and len(attrs["value"]) > 1:
             raise serializers.ValidationError(
                 {"value": [serializers.ErrorDetail("Too long", code="max_length")]}
             )
