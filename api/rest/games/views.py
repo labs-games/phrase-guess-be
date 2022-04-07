@@ -6,11 +6,11 @@ from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from backend.models import Game, Phrase, Team
+from backend.models import Game, GameConfigs, Ordering, Phrase, Team
 from common.rest.exceptions import ErrorCode, ErrorCodeException
 from common.rest.views import ActiveUserAPIViewMixin
 
-from .serializers import GameSerializer, PhraseSerializer, TeamSerializer
+from .serializers import GameCreationSerializer, GameSerializer, PhraseSerializer, TeamSerializer
 
 
 class GamesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
@@ -23,13 +23,21 @@ class GamesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
     @atomic
     def post(self, request: Request, *args, **kwargs) -> Response:
-        serializer: GameSerializer = self.get_serializer(data=request.data)
+        serializer: GameCreationSerializer = GameCreationSerializer(data=request.data)
         serializer.raise_validation_error_if_any()
 
-        requester: User = request.user
         validated_data: dict = serializer.validated_data
+        game_configs: GameConfigs = GameConfigs(
+            phrase_order=Ordering(validated_data["phrase_order"]),
+            team_order=Ordering(validated_data["team_order"]),
+        )
+
+        requester: User = request.user
         Game.objects.create(
-            name=validated_data["name"], created_by_id=requester.id, updated_by_id=requester.id
+            name=validated_data["name"],
+            created_by_id=requester.id,
+            updated_by_id=requester.id,
+            configs=game_configs.to_dict(),
         )
         return self.generate_no_error_response({})
 
@@ -50,12 +58,18 @@ class GameView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
         return self.generate_no_error_response(data)
 
     def put(self, request: Request, *args, **kwargs) -> Response:
-        serializer: GameSerializer = self.get_serializer(data=request.data)
+        serializer: GameCreationSerializer = GameCreationSerializer(data=request.data)
         serializer.raise_validation_error_if_any()
 
-        game: Game = self.get_object()
-        requester: User = request.user
         validated_data: dict = serializer.validated_data
+        game_configs: GameConfigs = GameConfigs(
+            phrase_order=Ordering(validated_data["phrase_order"]),
+            team_order=Ordering(validated_data["team_order"]),
+        )
+
+        requester: User = request.user
+        game: Game = self.get_object()
+        game.config_object = game_configs
         game.name = validated_data["name"]
         game.updated_by_id = requester.id
         game.save()
@@ -88,7 +102,7 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
         return self.generate_no_error_response({})
 
 
-class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
+class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveDestroyAPIView):
     queryset = Phrase.objects.order_by("id")
     serializer_class = PhraseSerializer
 
@@ -102,18 +116,6 @@ class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         data: dict = super().get(request, *args, **kwargs).data
         return self.generate_no_error_response(data)
-
-    def put(self, request: Request, *args, **kwargs) -> Response:
-        serializer: PhraseSerializer = self.get_serializer(data=request.data)
-        serializer.raise_validation_error_if_any()
-
-        phrase: Phrase = self.get_object()
-        requester: User = request.user
-        validated_data: dict = serializer.validated_data
-        phrase.value = validated_data["value"]
-        phrase.updated_by_id = requester.id
-        phrase.save()
-        return self.generate_no_error_response({})
 
     def delete(self, request, *args, **kwargs) -> Response:
         phrase: Phrase = self.get_object()
