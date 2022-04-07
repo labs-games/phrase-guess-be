@@ -41,5 +41,5 @@ class GuessCreationSerializer(serializers.Serializer, BaseSerializerMixin):
 class GuessSerializer(serializers.ModelSerializer, BaseSerializerMixin):
     class Meta:
         model = Guess
-        fields = ["team_id", "type", "status", "value", "score"]
+        fields = ["id", "team_id", "type", "status", "value", "score"]
         read_only_fields = ["__all__"]

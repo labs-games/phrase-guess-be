@@ -186,7 +186,7 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
             raise ErrorCodeException(ErrorCode.bad_request)
 
         guess_type: GuessType = GuessType(validated_data["type"])
-        guess_value: str = validated_data["value"]
+        guess_value: str = validated_data["value"].upper().strip()
         judgement: GuessJudgement = self._judge_guess(
             game_round=game_round,
             guess_type=guess_type,

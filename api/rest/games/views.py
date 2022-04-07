@@ -114,7 +114,7 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
         validated_data: dict = serializer.validated_data
         Phrase.objects.create(
             game=game,
-            value=validated_data["value"],
+            value=validated_data["value"].upper(),
             created_by_id=requester.id,
             updated_by_id=requester.id,
         )
