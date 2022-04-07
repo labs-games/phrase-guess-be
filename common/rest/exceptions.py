@@ -14,6 +14,10 @@ class ErrorCode(IntEnum):
     validation_error = 5
     resource_not_found = 6
     external_request_error = 7
+    empty_teams = 8
+    empty_phrases = 9
+    any_round_still_ongoing = 10
+    phrases_all_used = 11
 
 
 class FieldErrorCode(IntEnum):

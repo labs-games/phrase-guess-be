@@ -82,6 +82,7 @@ class RoundConfigs:
 class Round(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    is_ended = models.BooleanField(default=False)
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     configs = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -96,6 +97,9 @@ class Round(models.Model):
     @config_object.setter
     def config_object(self, val: RoundConfigs) -> None:
         self.configs = val.to_dict()
+
+    class Meta:
+        unique_together = [("game", "phrase")]
 
 
 class GuessType(enum.IntEnum):

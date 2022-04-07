@@ -43,7 +43,6 @@ class GamesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
 
 class GameView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Game.objects.order_by("-id")
     serializer_class = GameSerializer
 
     def get_object(self) -> Game:
@@ -117,7 +116,6 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
 
 class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveDestroyAPIView):
-    queryset = Phrase.objects.order_by("id")
     serializer_class = PhraseSerializer
 
     def get_object(self) -> Phrase:
@@ -174,7 +172,6 @@ class TeamsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
 
 class TeamView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Team.objects.order_by("-id")
     serializer_class = TeamSerializer
 
     def get_object(self) -> Team:
