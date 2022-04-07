@@ -82,8 +82,14 @@ class GameView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
 
 
 class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
-    queryset = Phrase.objects.order_by("id")
     serializer_class = PhraseSerializer
+
+    def get_queryset(self):
+        game_id: int = self.kwargs["game_id"]
+        game: Optional[Game] = Game.objects.filter(id=game_id)
+        if game is None:
+            raise ErrorCodeException(ErrorCode.resource_not_found)
+        return Phrase.objects.filter(game=game).order_by("id")
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         data: dict = super().get(request, *args, **kwargs).data
@@ -91,13 +97,21 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
     @atomic
     def post(self, request: Request, *args, **kwargs) -> Response:
+        game_id: int = self.kwargs["game_id"]
+        game: Optional[Game] = Game.objects.filter(id=game_id)
+        if game is None:
+            raise ErrorCodeException(ErrorCode.resource_not_found)
+
         serializer: PhraseSerializer = self.get_serializer(data=request.data)
         serializer.raise_validation_error_if_any()
 
         requester: User = request.user
         validated_data: dict = serializer.validated_data
         Phrase.objects.create(
-            value=validated_data["value"], created_by_id=requester.id, updated_by_id=requester.id
+            game=game,
+            value=validated_data["value"],
+            created_by_id=requester.id,
+            updated_by_id=requester.id,
         )
         return self.generate_no_error_response({})
 
@@ -107,8 +121,9 @@ class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveDestroyAPIView):
     serializer_class = PhraseSerializer
 
     def get_object(self) -> Phrase:
+        game_id: int = self.kwargs["game_id"]
         phrase_id: int = self.kwargs["phrase_id"]
-        phrase: Optional[Phrase] = Phrase.objects.filter(id=phrase_id).first()
+        phrase: Optional[Phrase] = Phrase.objects.filter(id=phrase_id, game_id=game_id).first()
         if phrase is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
         return phrase
@@ -124,8 +139,14 @@ class PhraseView(ActiveUserAPIViewMixin, generics.RetrieveDestroyAPIView):
 
 
 class TeamsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
-    queryset = Team.objects.order_by("-id")
     serializer_class = TeamSerializer
+
+    def get_queryset(self):
+        game_id: int = self.kwargs["game_id"]
+        game: Optional[Game] = Game.objects.filter(id=game_id)
+        if game is None:
+            raise ErrorCodeException(ErrorCode.resource_not_found)
+        return Team.objects.filter(game=game).order_by("id")
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         data: dict = super().get(request, *args, **kwargs).data
@@ -133,13 +154,21 @@ class TeamsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
     @atomic
     def post(self, request: Request, *args, **kwargs) -> Response:
+        game_id: int = self.kwargs["game_id"]
+        game: Optional[Game] = Game.objects.filter(id=game_id)
+        if game is None:
+            raise ErrorCodeException(ErrorCode.resource_not_found)
+
         serializer: TeamSerializer = self.get_serializer(data=request.data)
         serializer.raise_validation_error_if_any()
 
         requester: User = request.user
         validated_data: dict = serializer.validated_data
         Team.objects.create(
-            name=validated_data["name"], created_by_id=requester.id, updated_by_id=requester.id
+            game=game,
+            name=validated_data["name"],
+            created_by_id=requester.id,
+            updated_by_id=requester.id,
         )
         return self.generate_no_error_response({})
 
@@ -149,8 +178,9 @@ class TeamView(ActiveUserAPIViewMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TeamSerializer
 
     def get_object(self) -> Team:
+        game_id: int = self.kwargs["game_id"]
         team_id: int = self.kwargs["team_id"]
-        team: Optional[Team] = Team.objects.filter(id=team_id).first()
+        team: Optional[Team] = Team.objects.filter(id=team_id, game_id=game_id).first()
         if team is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
         return team
