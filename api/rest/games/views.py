@@ -91,7 +91,7 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         game_id: int = self.kwargs["game_id"]
-        game: Optional[Game] = Game.objects.filter(id=game_id)
+        game: Optional[Game] = Game.objects.filter(id=game_id).first()
         if game is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
         return Phrase.objects.filter(game=game).order_by("id")
@@ -147,7 +147,7 @@ class TeamsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         game_id: int = self.kwargs["game_id"]
-        game: Optional[Game] = Game.objects.filter(id=game_id)
+        game: Optional[Game] = Game.objects.filter(id=game_id).first()
         if game is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
         return Team.objects.filter(game=game).order_by("id")
