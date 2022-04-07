@@ -97,7 +97,7 @@ class PhrasesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
     @atomic
     def post(self, request: Request, *args, **kwargs) -> Response:
         game_id: int = self.kwargs["game_id"]
-        game: Optional[Game] = Game.objects.filter(id=game_id)
+        game: Optional[Game] = Game.objects.filter(id=game_id).first()
         if game is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
 
@@ -153,7 +153,7 @@ class TeamsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
     @atomic
     def post(self, request: Request, *args, **kwargs) -> Response:
         game_id: int = self.kwargs["game_id"]
-        game: Optional[Game] = Game.objects.filter(id=game_id)
+        game: Optional[Game] = Game.objects.filter(id=game_id).first()
         if game is None:
             raise ErrorCodeException(ErrorCode.resource_not_found)
 

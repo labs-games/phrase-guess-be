@@ -102,6 +102,9 @@ class Round(models.Model):
         unique_together = [("game", "phrase")]
 
 
+SCORE_PER_LETTERS: int = 1
+
+
 class GuessType(enum.IntEnum):
     letter = 1
     phrase = 2
