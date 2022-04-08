@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from backend.models import (
     SCORE_PER_LETTERS,
+    WRONG_PHRASE_PENALTY,
     Game,
     Guess,
     GuessStatus,
@@ -226,7 +227,9 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
     def _judge_phrase_guess(self, game_round: Round, guess_value: str) -> GuessJudgement:
         phrase_value: str = game_round.phrase.value
         if phrase_value != guess_value:
-            return GuessJudgement(status=GuessStatus.wrong, score=0, should_round_ended=False)
+            return GuessJudgement(
+                status=GuessStatus.wrong, score=WRONG_PHRASE_PENALTY, should_round_ended=False
+            )
         unguessed_letters: list[str] = _get_unguessed_letters(game_round)
         return GuessJudgement(
             status=GuessStatus.correct,

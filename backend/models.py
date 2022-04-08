@@ -103,6 +103,7 @@ class Round(models.Model):
 
 
 SCORE_PER_LETTERS: int = 1
+WRONG_PHRASE_PENALTY: int = -5
 
 
 class GuessType(enum.IntEnum):
