@@ -69,7 +69,7 @@ class RoundsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
 
         phrase: Phrase = self._compute_phrase(game)
         requester: User = request.user
-        Round.objects.create(
+        new_round: Round = Round.objects.create(
             game=game,
             phrase=phrase,
             name=validated_data["name"],
@@ -77,7 +77,7 @@ class RoundsView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
             created_by_id=requester.id,
             updated_by_id=requester.id,
         )
-        return self.generate_no_error_response({})
+        return self.generate_no_error_response({"id": new_round.id})
 
     def _compute_team_ids_order(self, game: Game, starting_team_id: int) -> list[int]:
         team_ids: list[int] = [t.id for t in Team.objects.filter(game=game).order_by("id")]
