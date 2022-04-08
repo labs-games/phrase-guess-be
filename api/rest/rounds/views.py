@@ -221,8 +221,10 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
     ) -> GuessJudgement:
         if guess_type == GuessType.phrase:
             return self._judge_phrase_guess(game_round, guess_value)
-        else:
+        elif guess_type == GuessType.letter:
             return self._judge_letter_guess(game_round, guess_value)
+        else:
+            return self._judge_timed_out_guess()
 
     def _judge_phrase_guess(self, game_round: Round, guess_value: str) -> GuessJudgement:
         phrase_value: str = game_round.phrase.value
@@ -250,6 +252,9 @@ class GuessesView(ActiveUserAPIViewMixin, generics.ListCreateAPIView):
             score=guess_value_counts * SCORE_PER_LETTERS,
             should_round_ended=guess_value_counts == len(unguessed_letters),
         )
+
+    def _judge_timed_out_guess(self) -> GuessJudgement:
+        return GuessJudgement(status=GuessStatus.timed_out, score=0, should_round_ended=False)
 
 
 def _get_unguessed_letters(game_round: Round) -> list[str]:

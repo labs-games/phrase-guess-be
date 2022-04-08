@@ -28,7 +28,7 @@ class RoundSerializer(serializers.ModelSerializer, BaseSerializerMixin):
 class GuessCreationSerializer(serializers.Serializer, BaseSerializerMixin):
     team_id = serializers.IntegerField()
     type = serializers.ChoiceField(choices=[g.value for g in GuessType])
-    value = serializers.CharField(max_length=200)
+    value = serializers.CharField(max_length=200, default='', required=False)
 
     def validate(self, attrs: dict) -> dict:
         if attrs["type"] == GuessType.letter and len(attrs["value"]) > 1:

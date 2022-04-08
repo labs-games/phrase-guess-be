@@ -109,11 +109,13 @@ WRONG_PHRASE_PENALTY: int = -5
 class GuessType(enum.IntEnum):
     letter = 1
     phrase = 2
+    timed_out = 3
 
 
 class GuessStatus(enum.IntEnum):
     correct = 1
     wrong = 2
+    timed_out = 3
 
 
 class Guess(models.Model):
